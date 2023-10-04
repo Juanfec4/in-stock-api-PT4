@@ -1,0 +1,11 @@
+this folder is for storing specific actions (services)
+
+EX:
+
+//Generate x-api-key
+
+export const generateApiKey = async () => {
+  const token = crypto.randomUUID();
+  const hashedToken = await bcrypt.hash(token, SALT_NUM);
+  return { token, hashedToken };
+};
