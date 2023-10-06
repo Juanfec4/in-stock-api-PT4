@@ -3,6 +3,11 @@ import inventoryController from "../controllers/inventoryController.js";
 
 const router = express.Router();
 
+//Get all inventory
+router.get("/", (req, res) => {
+  return inventoryController.handleGetInventories(req, res);
+});
+
 //Delete an inventory item
 router.delete("/:id", (req, res) => {
   return inventoryController.handleDeleteInventoryItem(req, res);

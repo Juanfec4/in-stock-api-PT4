@@ -10,8 +10,8 @@ const HOSTNAME = `http://${ip.address()}:${PORT}`;
 import CORS from "./src/middleware/allowCors.js";
 
 //Routers
-import warehouseRouter from "./routes/warehouse.js";
-import inventoryRouter from "./routes/inventory.js";
+import warehouseRouter from "./src/routes/warehouse.js";
+import inventoryRouter from "./src/routes/inventory.js";
 
 const app = express();
 

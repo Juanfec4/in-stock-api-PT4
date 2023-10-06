@@ -23,5 +23,6 @@ router.post("/", (req, res) => {
 //Delete warehouse
 
 //Edit warehouse
+//router.put("/:id", warehousesController.update);
 
 export default router;
