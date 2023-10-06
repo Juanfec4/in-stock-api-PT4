@@ -1,5 +1,6 @@
 import knexConfig from "../../knexfile.js";
 import knexLibrary from "knex";
+import { validateRequestBody } from "../utils/helpers/validators.js";
 
 const knex = knexLibrary(knexConfig);
 
@@ -31,6 +32,78 @@ const handleDeleteInventoryItem = async (req, res) => {
   }
 };
 
+//CREATE
+
+//EDIT
+const handleEditInventoryItem = async (req, res) => {
+  //Check if id param is present
+  if (!req?.params?.id) {
+    return res.status(400).json({ message: "Missing id param." });
+  }
+  //Required params
+  const keys = [
+    "warehouse_id",
+    "item_name",
+    "description",
+    "category",
+    "status",
+    "quantity",
+  ];
+  //Check for missing params
+  validateRequestBody(keys, req, (isComplete, message) => {
+    if (!isComplete) {
+      return res.status(400).json({ message });
+    }
+  });
+  //Check if quantity is not a number
+  if (Number.isNaN(req.body.quantity)) {
+    return res.status(400).json({ message: "Quantity is not a number." });
+  }
+
+  let query1 = { id: req.body.warehouse_id };
+  let query2 = { id: req.params.id };
+
+  //Extract values
+  const { warehouse_id, item_name, description, category, status, quantity } =
+    req.body;
+  try {
+    //Check if warehouse id exists
+    let warehouses = await knex.select("*").from("warehouses").where(query1);
+    if (warehouses.length === 0) {
+      return res.status(400).json({
+        message: `Warehouse with id ${req.body.warehouse_id} does not exist.`,
+      });
+    }
+    //Update item
+    await knex("inventories").where(query2).update({
+      warehouse_id,
+      item_name,
+      description,
+      category,
+      status,
+      quantity,
+    });
+
+    //Get updated item
+    let responseItem = await knex
+      .select(
+        "id",
+        "warehouse_id",
+        "item_name",
+        "description",
+        "category",
+        "status",
+        "quantity"
+      )
+      .from("inventories")
+      .where(query2);
+    return res.status(200).json(responseItem);
+  } catch (e) {
+    return res.status(500).json({ message: e });
+  }
+};
+
 export default {
   handleDeleteInventoryItem,
+  handleEditInventoryItem,
 };

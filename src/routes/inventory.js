@@ -8,4 +8,9 @@ router.delete("/:id", (req, res) => {
   return inventoryController.handleDeleteInventoryItem(req, res);
 });
 
+//Create an inventory @ warehouse
+router.put("/:id", (req, res) => {
+  return inventoryController.handleEditInventoryItem(req, res);
+});
+
 export default router;
