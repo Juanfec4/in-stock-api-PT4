@@ -101,11 +101,10 @@ const createWarehouse = async (req, res) => {
   let phoneNumber = formatPhoneNumber(req.body.contact_phone);
 
   //Check for missing params
-  validateRequestBody(keys, req, (isComplete, message) => {
-    if (!isComplete) {
-      return res.status(400).json({ message });
-    }
-  });
+  let isComplete = validateRequestBody(keys, req);
+  if (!isComplete) {
+    return res.status(400).json({ message: "Missing properties." });
+  }
   //Check for valid email address and phone number
   if (!isValidEmail(req.body.contact_email)) {
     return res

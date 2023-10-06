@@ -33,6 +33,67 @@ const handleDeleteInventoryItem = async (req, res) => {
 };
 
 //CREATE
+const handleCreateInventoryItem = async (req, res) => {
+  //Required params
+  const keys = [
+    "warehouse_id",
+    "item_name",
+    "description",
+    "category",
+    "status",
+    "quantity",
+  ];
+  //Check for missing params
+  let isComplete = validateRequestBody(keys, req);
+  if (!isComplete) {
+    return res.status(400).json({ message: "Missing properties." });
+  }
+  //Check if quantity is not a number
+  if (Number.isNaN(Number(req.body.quantity))) {
+    return res.status(400).json({ message: "Quantity is not a number." });
+  }
+  let query1 = { id: req.body.warehouse_id };
+
+  //Extract values
+  const { warehouse_id, item_name, description, category, status, quantity } =
+    req.body;
+  try {
+    //Check if warehouse id exists
+    let warehouses = await knex.select("*").from("warehouses").where(query1);
+    if (warehouses.length === 0) {
+      return res.status(400).json({
+        message: `Warehouse with id ${warehouse_id} does not exist.`,
+      });
+    }
+
+    //Create item
+    let createdID = await knex("inventories").insert({
+      warehouse_id,
+      item_name,
+      description,
+      category,
+      status,
+      quantity,
+    });
+
+    //Get added record
+    let createdRecord = await knex
+      .select(
+        "id",
+        "warehouse_id",
+        "item_name",
+        "description",
+        "category",
+        "status",
+        "quantity"
+      )
+      .from("inventories")
+      .where({ id: createdID[0] });
+    return res.status(201).json(createdRecord);
+  } catch (e) {
+    return res.status(500).json({ message: e });
+  }
+};
 
 //EDIT
 const handleEditInventoryItem = async (req, res) => {
@@ -50,13 +111,12 @@ const handleEditInventoryItem = async (req, res) => {
     "quantity",
   ];
   //Check for missing params
-  validateRequestBody(keys, req, (isComplete, message) => {
-    if (!isComplete) {
-      return res.status(400).json({ message });
-    }
-  });
+  let isComplete = validateRequestBody(keys, req);
+  if (!isComplete) {
+    return res.status(400).json({ message: "Missing properties." });
+  }
   //Check if quantity is not a number
-  if (Number.isNaN(req.body.quantity)) {
+  if (Number.isNaN(Number(req.body.quantity))) {
     return res.status(400).json({ message: "Quantity is not a number." });
   }
 
@@ -71,7 +131,7 @@ const handleEditInventoryItem = async (req, res) => {
     let warehouses = await knex.select("*").from("warehouses").where(query1);
     if (warehouses.length === 0) {
       return res.status(400).json({
-        message: `Warehouse with id ${req.body.warehouse_id} does not exist.`,
+        message: `Warehouse with id ${warehouse_id} does not exist.`,
       });
     }
     //Update item
@@ -106,4 +166,5 @@ const handleEditInventoryItem = async (req, res) => {
 export default {
   handleDeleteInventoryItem,
   handleEditInventoryItem,
+  handleCreateInventoryItem,
 };
