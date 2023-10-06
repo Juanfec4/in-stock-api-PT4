@@ -18,7 +18,7 @@ const getWarehouses = async (req, res) => {
 
   try {
     const warehouses = await knex
-      .column(
+      .select(
         "id",
         "warehouse_name",
         "address",
@@ -29,7 +29,6 @@ const getWarehouses = async (req, res) => {
         "contact_phone",
         "contact_email"
       )
-      .select()
       .from("warehouses");
     //Convert result (Row packet into JSON object)
     let result = rowDataToJson(warehouses);
@@ -54,7 +53,7 @@ const getWarehouse = async (req, res) => {
   try {
     //Get Warehouse
     const warehouse = await knex
-      .column(
+      .select(
         "id",
         "warehouse_name",
         "address",
@@ -65,7 +64,6 @@ const getWarehouse = async (req, res) => {
         "contact_phone",
         "contact_email"
       )
-      .select()
       .from("warehouses")
       .where(query);
 
@@ -147,7 +145,7 @@ const createWarehouse = async (req, res) => {
 
     //Get added record
     let createdRecord = await knex
-      .column(
+      .select(
         "id",
         "warehouse_name",
         "address",
@@ -158,7 +156,6 @@ const createWarehouse = async (req, res) => {
         "contact_phone",
         "contact_email"
       )
-      .select()
       .from("warehouses")
       .where({ id: createdID[0] });
 
@@ -168,7 +165,6 @@ const createWarehouse = async (req, res) => {
     //Return created record
     return res.status(201).json(result);
   } catch (e) {
-    console.log(e);
     return res.status(500).json({ message: e });
   }
 };
