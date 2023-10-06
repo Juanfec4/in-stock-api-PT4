@@ -20,7 +20,13 @@ app.use(CORS);
 app.use(express.json());
 app.use("/", logger);
 
-//Routes
+//Importing Routes and Controllers
+const warehousesRoutes = require('./routes/warehousesRoutes');
+const inventoriesRoutes = require('./routes/inventoriesRoutes');
+
+//Using Routes
+app.use('/api/warehouses', warehousesRoutes);
+app.use('/api/inventories', inventoriesRoutes);
 
 //404 Handling
 app.use((req, res) => {
