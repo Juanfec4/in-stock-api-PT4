@@ -5,7 +5,7 @@ import "dotenv/config";
  */
 
 export default {
-  client: 'mysql',
+  client: "mysql",
   connection: {
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
@@ -15,10 +15,10 @@ export default {
 
   migrations: {
     tableName: "knex_migrations",
-    directory: "./src/migrations",
+    directory: "./src/db/migrations",
   },
 
   seeds: {
-    directory: "./src/seeds",
-  }
+    directory: "./src/db/seeds",
+  },
 };
