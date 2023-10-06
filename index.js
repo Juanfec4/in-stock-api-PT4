@@ -1,13 +1,14 @@
 import express from "express";
 import "dotenv/config";
 import ip from "ip";
-import logger from "./config/morganConfig.js";
+import logger from "./src/config/morganConfig.js";
 
 const PORT = process.env.PORT || 3030;
 const HOSTNAME = `http://${ip.address()}:${PORT}`;
 
 //Modules
-import CORS from "./middleware/allowCors.js";
+import CORS from "./src/middleware/allowCors.js";
+
 
 const app = express();
 
@@ -21,12 +22,12 @@ app.use(express.json());
 app.use("/", logger);
 
 //Importing Routes and Controllers
-const warehousesRoutes = require('./routes/warehousesRoutes');
-const inventoriesRoutes = require('./routes/inventoriesRoutes');
+// import warehousesRoutes from './src/routes/warehousesRoutes.mjs';
+import inventoriesRoutes from './src/routes/inventoriesRoutes.mjs';
 
 //Using Routes
-app.use('/api/warehouses', warehousesRoutes);
-app.use('/api/inventories', inventoriesRoutes);
+// app.use('/api/warehouses', warehousesRoutes);
+app.use('/api', inventoriesRoutes);
 
 //404 Handling
 app.use((req, res) => {

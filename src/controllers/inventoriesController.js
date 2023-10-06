@@ -1,17 +1,25 @@
-const knex = require("knex")(require("../knexfile"));
+import knexConfig from "../../knexfile.js";
+import knexLibrary from "knex";
+
+const knex = knexLibrary(knexConfig);
 
 const index = async (req, res) => {
+    console.log("Entering index function");
+    
     try {
         let allInventories = await knex('inventories')
             .join('warehouses', 'inventories.warehouse_id', '=', 'warehouses.id')
-            .select('inventories.id', 
-            'warehouses.name as warehouse_name', 
-            'inventories.item_name', 
-            'inventories.description', 
-            'inventories.category', 
-            'inventories.status', 
-            'inventories.quantity');
-        
+            .select(
+                'inventories.id',
+                'warehouses.warehouse_name as warehouse_name',
+                'inventories.item_name',
+                'inventories.description',
+                'inventories.category',
+                'inventories.status',
+                'inventories.quantity'
+            );
+
+
         res.status(200).json(allInventories);
     } catch (err) {
         console.error(err);
@@ -19,6 +27,4 @@ const index = async (req, res) => {
     }
 };
 
-module.exports = {
-    index
-}
+export default { index }; 
