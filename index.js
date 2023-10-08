@@ -11,7 +11,7 @@ import CORS from "./src/middleware/allowCors.js";
 
 
 //Routers
-import warehouseRouter from "./routes/warehouseRoutes.js";
+import warehouse from "./src/routes/warehouse.js"
 import inventoriesRoutes from './src/routes/inventoriesRoutes.mjs';
 const app = express();
 
@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/", logger);
 
 //Routes
-app.use("/warehouses", warehouseRouter);
+app.use("/warehouses", warehouse);
 app.use('/api', inventoriesRoutes);
 
 

@@ -177,31 +177,43 @@ const createWarehouse = async (req, res) => {
 
 //EDIT
 const editWarehouse = async (req, res) => {
-  //Get all warehouses --> SELECT id, warehouse_name, address, etc... FROM warehouses
+  // Step 1: Extract and Validate Data
 
+  const warehouseData = req.body;
+  const warehouseId = req.params.id;
+
+  // Simple validation
+  if (!Object.values(warehouseData).every(value => value)) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  // TODO: Validate phone and email format
+
+  //Update Data
   try {
-    const warehouses = await knex
-      .column(
-        "id",
-        "warehouse_name",
-        "address",
-        "city",
-        "country",
-        "contact_name",
-        "contact_position",
-        "contact_phone",
-        "contact_email"
-      )
-      .select()
-      .from("warehouses");
-      let result = rowDataToJson(warehouses)
+    const updatedRows = await knex('warehouses')
+      .where('id', warehouseId)
+      .update(warehouseData);
 
-      //Return result
-    return res.status(200).json(result);
-      } catch (e) {
-        return res.status(500).json({ message: e });
-      }
+    if (!updatedRows) {
+      return res.status(404).json({ message: 'Warehouse not found.' });
     }
+
+    const updatedWarehouse = await knex('warehouses')
+    .where('id', warehouseId)
+    .first();
+
+    //Respond
+    return res.status(200).json(updatedWarehouse);
+
+  } catch (e) {
+    
+    //Error Handling
+    console.error(e);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+}
+
 
 
 //DELETE
