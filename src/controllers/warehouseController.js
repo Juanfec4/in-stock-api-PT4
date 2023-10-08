@@ -176,6 +176,33 @@ const createWarehouse = async (req, res) => {
 //TODO
 
 //EDIT
+const editWarehouse = async (req, res) => {
+  //Get all warehouses --> SELECT id, warehouse_name, address, etc... FROM warehouses
+
+  try {
+    const warehouses = await knex
+      .column(
+        "id",
+        "warehouse_name",
+        "address",
+        "city",
+        "country",
+        "contact_name",
+        "contact_position",
+        "contact_phone",
+        "contact_email"
+      )
+      .select()
+      .from("warehouses");
+      let result = rowDataToJson(warehouses)
+
+      //Return result
+    return res.status(200).json(result);
+      } catch (e) {
+        return res.status(500).json({ message: e });
+      }
+    }
+
 
 //DELETE
 
@@ -183,4 +210,5 @@ export default {
   getWarehouses,
   getWarehouse,
   createWarehouse,
+  editWarehouse,
 };
