@@ -27,4 +27,5 @@ router.put("/warehouses/:id", (req, res) => {
   return warehouseController.editWarehouse (req, res);
 });
 
+
 export default router;

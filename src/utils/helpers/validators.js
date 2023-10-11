@@ -13,11 +13,11 @@ export const isValidPhoneNumber = (str) => {
 };
 
 //Validate request object keys
-export const validateRequestBody = (keys, req, callback) => {
+export const validateRequestBody = (keys, req) => {
   for (let key of keys) {
     if (!req?.body?.[key]) {
-      return callback(false, `Missing ${formatKey(key)}.`);
+      return false;
     }
   }
-  return callback(true, "All keys are present.");
+  return true;
 };

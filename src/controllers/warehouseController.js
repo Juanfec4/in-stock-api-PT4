@@ -18,7 +18,7 @@ const getWarehouses = async (req, res) => {
 
   try {
     const warehouses = await knex
-      .column(
+      .select(
         "id",
         "warehouse_name",
         "address",
@@ -29,7 +29,6 @@ const getWarehouses = async (req, res) => {
         "contact_phone",
         "contact_email"
       )
-      .select()
       .from("warehouses");
     //Convert result (Row packet into JSON object)
     let result = rowDataToJson(warehouses);
@@ -54,7 +53,7 @@ const getWarehouse = async (req, res) => {
   try {
     //Get Warehouse
     const warehouse = await knex
-      .column(
+      .select(
         "id",
         "warehouse_name",
         "address",
@@ -65,7 +64,6 @@ const getWarehouse = async (req, res) => {
         "contact_phone",
         "contact_email"
       )
-      .select()
       .from("warehouses")
       .where(query);
 
@@ -103,11 +101,10 @@ const createWarehouse = async (req, res) => {
   let phoneNumber = formatPhoneNumber(req.body.contact_phone);
 
   //Check for missing params
-  validateRequestBody(keys, req, (isComplete, message) => {
-    if (!isComplete) {
-      return res.status(400).json({ message });
-    }
-  });
+  let isComplete = validateRequestBody(keys, req);
+  if (!isComplete) {
+    return res.status(400).json({ message: "Missing properties." });
+  }
   //Check for valid email address and phone number
   if (!isValidEmail(req.body.contact_email)) {
     return res
@@ -147,7 +144,7 @@ const createWarehouse = async (req, res) => {
 
     //Get added record
     let createdRecord = await knex
-      .column(
+      .select(
         "id",
         "warehouse_name",
         "address",
@@ -158,7 +155,6 @@ const createWarehouse = async (req, res) => {
         "contact_phone",
         "contact_email"
       )
-      .select()
       .from("warehouses")
       .where({ id: createdID[0] });
 
@@ -168,7 +164,6 @@ const createWarehouse = async (req, res) => {
     //Return created record
     return res.status(201).json(result);
   } catch (e) {
-    console.log(e);
     return res.status(500).json({ message: e });
   }
 };
@@ -241,6 +236,37 @@ const editWarehouse = async (req, res) => {
 
 
 //DELETE
+
+//REPEATED CREATE
+const newWarehouse = async (req, res) => {
+  //SELECT * FROM users WHERE email = 'email param'
+  let existingUser = await knex
+    .select("*")
+    .from("users")
+    .where({ email: email });
+
+  //Insert user into database
+  //TRY, if not return error in catch
+  try {
+    //INSERT INTO users (email, password, verification_code)
+    //values ('my email', 'my password', 'verification code')
+    await knex("warehouses").insert({
+      warehouse_name: "Brooklyn",
+      address: "918 Morris Lane",
+      city: "Brooklyn",
+      country: "USA",
+      contact_name: "Parmin Aujla",
+      contact_position: "Warehouse Manager",
+      contact_phone: "+1 (646) 123-1234",
+      contact_email: "paujla@instock.com",
+    });
+    return res.status(201).json({
+      message: `User created, please check your email: ${email} for verification instructions.`,
+    });
+  } catch (e) {
+    return res.status(500).json({ message: e });
+  }
+};
 
 export default {
   getWarehouses,
