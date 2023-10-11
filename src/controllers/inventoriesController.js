@@ -1,5 +1,10 @@
 import knexConfig from "../../knexfile.js";
 import knexLibrary from "knex";
+import e from "express";
+import {
+    formatPhoneNumber,
+    rowDataToJson,
+  } from "../utils/helpers/formatters.js";
 
 const knex = knexLibrary(knexConfig);
 
@@ -34,7 +39,6 @@ const getSingleItem = async (req, res) => {
     }
   
     //Extract specific query
-    let query = { 'inventories.id': req.params.id };
   
     try {
       //Get Inventory item details
@@ -49,20 +53,21 @@ const getSingleItem = async (req, res) => {
           'inventories.status',
           'inventories.quantity'
         )
-        .where(query);
-  
+        .where('inventories.id', "=", req.params.id )
+        .first();
+
       //Check if results are 0 (no inventory found)
-      if (inventory?.length === 0) {
+      if (!inventory) {
         return res.status(404).json({ message: `No inventory found with id ${req.params.id}` });
       }
   
       //Convert result (Row packet into JSON object)
-      let result = rowDataToJson(inventory[0]); 
-  
+      let result = rowDataToJson(inventory); 
+      
       //Return result
       return res.status(200).json(result);
     } catch (e) {
-      return res.status(500).json({ message: e });
+      return res.status(500).json({ message: `error loading data ${e.message}` });
     }
   };
   

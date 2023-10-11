@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/", logger);
 
 //Routes
-app.use("/warehouses", warehouse);
+app.use("/api", warehouse);
 app.use('/api', inventoriesRoutes);
 
 
