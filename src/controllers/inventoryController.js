@@ -28,6 +28,47 @@ const handleGetInventories = async (req, res) => {
   }
 };
 
+//GET single Invetnroy Item
+const getSingleItem = async (req, res) => {
+  //Check for id param
+  if (!req?.params?.id) {
+    return res.status(400).json({ message: "Missing id param." });
+  }
+
+  //Extract specific query
+
+  try {
+    //Get Inventory item details
+    const inventory = await knex('inventories')
+      .join('warehouses', 'inventories.warehouse_id', '=', 'warehouses.id')
+      .select(
+        'inventories.id',
+        'warehouses.warehouse_name',
+        'inventories.item_name',
+        'inventories.description',
+        'inventories.category',
+        'inventories.status',
+        'inventories.quantity'
+      )
+      .where('inventories.id', "=", req.params.id )
+      .first();
+
+    //Check if results are 0 (no inventory found)
+    if (!inventory) {
+      return res.status(404).json({ message: `No inventory found with id ${req.params.id}` });
+    }
+
+    //Convert result (Row packet into JSON object)
+    let result = rowDataToJson(inventory); 
+    
+    //Return result
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(500).json({ message: `error loading data ${e.message}` });
+  }
+};
+
+
 //DELETE
 const handleDeleteInventoryItem = async (req, res) => {
   //Check if id param exists
@@ -192,4 +233,5 @@ export default {
   handleEditInventoryItem,
   handleCreateInventoryItem,
   handleGetInventories,
+  getSingleItem,
 };

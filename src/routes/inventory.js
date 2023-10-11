@@ -8,6 +8,14 @@ router.get("/", (req, res) => {
   return inventoryController.handleGetInventories(req, res);
 });
 
+//Get single Inventory
+router.get("/inventories/:id", (req, res) => {
+  return inventoriesController.getSingleItem(req, res)
+})
+
+//Get inventory @ warehouse
+
+
 //Delete an inventory item
 router.delete("/:id", (req, res) => {
   return inventoryController.handleDeleteInventoryItem(req, res);
