@@ -5,7 +5,7 @@ const middleware = new express.Router();
 
 middleware.use(
   cors({
-    origin: process.env.ORIGIN,
+    origin: process.env.CLIENT_URL,
   })
 );
 
