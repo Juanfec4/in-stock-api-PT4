@@ -84,6 +84,45 @@ const getWarehouse = async (req, res) => {
   }
 };
 
+//Get inventory @ Warehouse
+const getInventoryAtWarehouse = async (req, res) => {
+  const warehouseId = req.params.id;
+
+
+  //Validate warehouseId
+  if (!warehouseId) {
+    return res.status(400).json({ message: 'Warehouse ID is required.' });
+  }
+
+  try {
+    //Check if the warehouse exists
+    const warehouseExists = await knex('warehouses').where('id', warehouseId).first();
+    if (!warehouseExists) {
+        return res.status(404).json({ message: 'Warehouse not found.' });
+    }
+
+    //Fetch Inventory items associated with the given warehouse
+    const inventories = await knex('inventories').where('warehouse_id', warehouseId).select(
+      'id',
+      'item_name',
+      'category',
+      'status',
+      'quantity'
+    );
+    return res.status(200).json(inventories)
+
+    //Error Logging
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: `Internal Server Error. Message ${e.message}`});
+  } 
+};
+
+
+
+
+
+
 //CREATE
 const createWarehouse = async (req, res) => {
   //Required params
@@ -237,40 +276,11 @@ const editWarehouse = async (req, res) => {
 
 //DELETE
 
-//REPEATED CREATE
-const newWarehouse = async (req, res) => {
-  //SELECT * FROM users WHERE email = 'email param'
-  let existingUser = await knex
-    .select("*")
-    .from("users")
-    .where({ email: email });
-
-  //Insert user into database
-  //TRY, if not return error in catch
-  try {
-    //INSERT INTO users (email, password, verification_code)
-    //values ('my email', 'my password', 'verification code')
-    await knex("warehouses").insert({
-      warehouse_name: "Brooklyn",
-      address: "918 Morris Lane",
-      city: "Brooklyn",
-      country: "USA",
-      contact_name: "Parmin Aujla",
-      contact_position: "Warehouse Manager",
-      contact_phone: "+1 (646) 123-1234",
-      contact_email: "paujla@instock.com",
-    });
-    return res.status(201).json({
-      message: `User created, please check your email: ${email} for verification instructions.`,
-    });
-  } catch (e) {
-    return res.status(500).json({ message: e });
-  }
-};
 
 export default {
   getWarehouses,
   getWarehouse,
   createWarehouse,
   editWarehouse,
+  getInventoryAtWarehouse
 };

@@ -13,7 +13,6 @@ router.get("/inventories/:id", (req, res) => {
   return inventoriesController.getSingleItem(req, res)
 })
 
-//Get inventory @ warehouse
 
 
 //Delete an inventory item
