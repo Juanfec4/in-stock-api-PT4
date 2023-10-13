@@ -40,18 +40,15 @@ const getSingleItem = async (req, res) => {
   try {
     //Get Inventory item details
     const inventory = await knex("inventories")
-      .join("warehouses", "inventories.warehouse_id", "=", "warehouses.id")
       .select(
-        "inventories.id",
-        "warehouses.warehouse_name",
-        "inventories.item_name",
-        "inventories.description",
-        "inventories.category",
-        "inventories.status",
-        "inventories.quantity"
+        "id",
+        "item_name",
+        "description",
+        "category",
+        "status",
+        "quantity"
       )
-      .where("inventories.id", "=", req.params.id)
-      .first();
+      .where({ warehouse_id: req.params.id });
 
     //Check if results are 0 (no inventory found)
     if (!inventory) {
@@ -61,10 +58,10 @@ const getSingleItem = async (req, res) => {
     }
 
     //Convert result (Row packet into JSON object)
-    let result = rowDataToJson(inventory);
+    // let result = rowDataToJson(inventory);
 
     //Return result
-    return res.status(200).json(result);
+    return res.status(200).json(inventory);
   } catch (e) {
     return res.status(500).json({ message: `error loading data ${e.message}` });
   }

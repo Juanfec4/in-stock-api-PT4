@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
 
 //Get single Inventory
 router.get("/:id", (req, res) => {
-  return inventoriesController.getSingleItem(req, res);
+  return inventoryController.getSingleItem(req, res);
 });
 
 //Get inventory @ warehouse
