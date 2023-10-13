@@ -26,6 +26,9 @@ router.post("/", (req, res) => {
 //TODO
 
 //Delete warehouse
+router.delete('/:id', (req, res) => {
+  return warehouseController.deleteWarehouse(req, res);
+});
 
 //Edit warehouse
 router.put("/:id", (req, res) => {

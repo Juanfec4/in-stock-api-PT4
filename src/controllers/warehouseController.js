@@ -275,12 +275,49 @@ const editWarehouse = async (req, res) => {
 
 
 //DELETE
+const deleteWarehouse = async (req, res) => {
+  //Check if id param exists
+  if (!req?.params?.id) {
+    return res.status(400).json({ message: "Missing id param." });
+  }
 
+  let query = {id: req.params.id };
+
+  try {
+    //Check if warehouse exists
+    let warehouse = await knex.select("*")
+    .from("warehouses")
+    .where(query);
+    
+    if (warehouse.length === 0) {
+      return res
+      .status(404)
+      .json({ message: `Warehouse not found for id ${req.params.id}.` });
+    }
+
+    //Delete Iventory Items first
+    await knex("inventories")
+    .where({ warehouse_id: req.params.id })
+    .del();
+
+    //Delete Warehouse
+    await knex("warehouses")
+    .where(query)
+    .del();
+
+    return res
+      .status(204)
+      .json({ message: `Successfully deleted warehouse ${req.params.id}.` });
+  } catch (e) {
+    return res.status(500).json({ message: e });
+  }
+};
 
 export default {
   getWarehouses,
   getWarehouse,
   createWarehouse,
   editWarehouse,
-  getInventoryAtWarehouse
+  getInventoryAtWarehouse,
+  deleteWarehouse
 };
