@@ -4,17 +4,22 @@ import warehouseController from "../controllers/warehouseController.js";
 const router = express.Router();
 
 //Get all warehouses
-router.get("/warehouses", (req, res) => {
+router.get("/", (req, res) => {
   return warehouseController.getWarehouses(req, res);
 });
 
 //Get a single warehouse
-router.get("/warehouses/:id", (req, res) => {
+router.get("/:id", (req, res) => {
   return warehouseController.getWarehouse(req, res);
 });
 
+//Get inventory @ warehouse
+router.get("/:id/inventories", (req, res) => {
+  return warehouseController.getInventoryAtWarehouse (req, res)
+});
+
 //Create a warehouse
-router.post("/warehouses", (req, res) => {
+router.post("/", (req, res) => {
   return warehouseController.createWarehouse(req, res);
 });
 
@@ -23,7 +28,7 @@ router.post("/warehouses", (req, res) => {
 //Delete warehouse
 
 //Edit warehouse
-router.put("/warehouses/:id", (req, res) => {
+router.put("/:id", (req, res) => {
   return warehouseController.editWarehouse (req, res);
 });
 
