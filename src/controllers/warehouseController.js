@@ -98,8 +98,16 @@ const createWarehouse = async (req, res) => {
     "warehouse_name",
   ];
   //Convert phone number string to phone number
-  let phoneNumber = formatPhoneNumber(req.body.contact_phone);
-
+  let phoneNumber;
+  try {
+    phoneNumber = formatPhoneNumber(req.body.contact_phone);
+  } catch (e) {
+    return res.status(400).json({
+      message:
+        "Invalid phone number format, please provide a string containing countryCode, areaCode, centralOfficeCode, lineNumber",
+      example_format: "Input:19197972875 -->  Output: +1 (919) 797-2875",
+    });
+  }
   //Check for missing params
   let isComplete = validateRequestBody(keys, req);
   if (!isComplete) {
@@ -168,14 +176,11 @@ const createWarehouse = async (req, res) => {
   }
 };
 
-//TODO
-
 //EDIT
 const editWarehouse = async (req, res) => {
   // Step 1: Log the incoming data
-  console.log('Request Body:', req.body);
-  console.log('Request Params:', req.params);
-  
+  console.log("Request Body:", req.body);
+  console.log("Request Params:", req.params);
 
   // Step 2: Extract and Validate Data
   const {
@@ -186,7 +191,7 @@ const editWarehouse = async (req, res) => {
     contact_name,
     contact_position,
     contact_phone,
-    contact_email
+    contact_email,
   } = req.body;
 
   const warehouseId = req.params.id;
@@ -199,70 +204,70 @@ const editWarehouse = async (req, res) => {
     contact_name,
     contact_position,
     contact_phone,
-    contact_email
+    contact_email,
   };
-  console.log('Warehouse Data:', warehouseData);
+  console.log("Warehouse Data:", warehouseData);
 
   // Check that the structured data is not empty
-  if (!Object.values(warehouseData).every(value => value)) {
-    return res.status(400).json({ message: 'All fields are required.' });
+  if (!Object.values(warehouseData).every((value) => value)) {
+    return res.status(400).json({ message: "All fields are required." });
   }
 
   // TODO: Validate phone and email format
 
   // Update Data
   try {
-    const updatedRows = await knex('warehouses')
-      .where('id', warehouseId)
+    const updatedRows = await knex("warehouses")
+      .where("id", warehouseId)
       .update(warehouseData);
 
     if (!updatedRows) {
-      return res.status(404).json({ message: 'Warehouse not found.' });
+      return res.status(404).json({ message: "Warehouse not found." });
     }
 
-    const updatedWarehouse = await knex('warehouses')
-      .where('id', warehouseId)
+    const updatedWarehouse = await knex("warehouses")
+      .where("id", warehouseId)
       .first();
 
     // Respond
     return res.status(200).json(updatedWarehouse);
-
   } catch (e) {
     // Error Handling
     console.error(e);
-    return res.status(500).json({ message: `Internal server error. ${e.message}` });
+    return res
+      .status(500)
+      .json({ message: `Internal server error. ${e.message}` });
   }
-}
-
+};
 
 //DELETE
+const deleteWarehouse = async (req, res) => {
+  //Check if id param exists
+  if (!req?.params?.id) {
+    return res.status(400).json({ message: "Missing id param." });
+  }
 
-//REPEATED CREATE
-const newWarehouse = async (req, res) => {
-  //SELECT * FROM users WHERE email = 'email param'
-  let existingUser = await knex
-    .select("*")
-    .from("users")
-    .where({ email: email });
+  let query = { id: req.params.id };
 
-  //Insert user into database
-  //TRY, if not return error in catch
   try {
-    //INSERT INTO users (email, password, verification_code)
-    //values ('my email', 'my password', 'verification code')
-    await knex("warehouses").insert({
-      warehouse_name: "Brooklyn",
-      address: "918 Morris Lane",
-      city: "Brooklyn",
-      country: "USA",
-      contact_name: "Parmin Aujla",
-      contact_position: "Warehouse Manager",
-      contact_phone: "+1 (646) 123-1234",
-      contact_email: "paujla@instock.com",
-    });
-    return res.status(201).json({
-      message: `User created, please check your email: ${email} for verification instructions.`,
-    });
+    //Check if warehouse exists
+    let warehouse = await knex.select("*").from("warehouses").where(query);
+
+    if (warehouse.length === 0) {
+      return res
+        .status(404)
+        .json({ message: `Warehouse not found for id ${req.params.id}.` });
+    }
+
+    //Delete Iventory Items first
+    await knex("inventories").where({ warehouse_id: req.params.id }).del();
+
+    //Delete Warehouse
+    await knex("warehouses").where(query).del();
+
+    return res
+      .status(204)
+      .json({ message: `Successfully deleted warehouse ${req.params.id}.` });
   } catch (e) {
     return res.status(500).json({ message: e });
   }
@@ -273,4 +278,5 @@ export default {
   getWarehouse,
   createWarehouse,
   editWarehouse,
+  deleteWarehouse,
 };

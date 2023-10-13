@@ -28,7 +28,7 @@ const handleGetInventories = async (req, res) => {
   }
 };
 
-//GET single Inventory Item
+//GET single Inventory at warehouse id
 const getSingleItem = async (req, res) => {
   //Check for id param
   if (!req?.params?.id) {
@@ -104,22 +104,27 @@ const handleCreateInventoryItem = async (req, res) => {
     "description",
     "category",
     "status",
-    "quantity",
   ];
   //Check for missing params
   let isComplete = validateRequestBody(keys, req);
   if (!isComplete) {
     return res.status(400).json({ message: "Missing properties." });
   }
-  //Check if quantity is not a number
-  if (Number.isNaN(Number(req.body.quantity))) {
-    return res.status(400).json({ message: "Quantity is not a number." });
-  }
   let query1 = { id: req.body.warehouse_id };
 
   //Extract values
-  const { warehouse_id, item_name, description, category, status, quantity } =
+  let { warehouse_id, item_name, description, category, status, quantity } =
     req.body;
+
+  if (!quantity) {
+    quantity = 0;
+  }
+
+  //Check if quantity is not a number
+  if (Number.isNaN(Number(quantity))) {
+    return res.status(400).json({ message: "Quantity is not a number." });
+  }
+
   try {
     //Check if warehouse id exists
     let warehouses = await knex.select("*").from("warehouses").where(query1);

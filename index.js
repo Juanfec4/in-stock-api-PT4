@@ -10,8 +10,10 @@ const HOSTNAME = `http://${ip.address()}:${PORT}`;
 import CORS from "./src/middleware/allowCors.js";
 
 //Routers
-import warehouseRouter from "./src/routes/warehouse.js"
-import inventoryRouter from './src/routes/inventory.js';
+import warehouseRouter from "./src/routes/warehouse.js";
+import inventoryRouter from "./src/routes/inventory.js";
+import itemRouter from "./src/routes/item.js";
+import categoryRouter from "./src/routes/category.js";
 
 const app = express();
 
@@ -27,7 +29,8 @@ app.use("/", logger);
 //Routes
 app.use("/api/warehouses", warehouseRouter);
 app.use("/api/inventories", inventoryRouter);
-
+app.use("/api/items", itemRouter);
+app.use("/api/categories", categoryRouter);
 
 //404 Handling
 app.use((req, res) => {
